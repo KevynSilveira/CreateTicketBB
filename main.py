@@ -1,46 +1,49 @@
 from datetime import date
-from pyboleto.bank.bank_brasil import BoletoBB
+from datetime import datetime
+from decimal import Decimal
+from pyboleto.bank.bancodobrasil import BoletoBB
+from pyboleto.pdf import BoletoPDF
 
-def criar_boleto():
-    d = BoletoBB()
+def gerar_boleto_banco_do_brasil():
+    data_vencimento = date.today()  # Data de vencimento
+    valor = Decimal('100.00')  # Valor do boleto
 
-    d.nosso_numero = '0000000001'
-    d.numero_documento = '27.030195.10'
+    boleto = BoletoBB(7, 2)  # Código do banco e código da moeda
+    boleto.nosso_numero = '123456789'  # Seu número único
+    boleto.numero_documento = '123456789'  # Número do documento
+    boleto.convenio = '1234567'  # Número do convênio
+    boleto.carteira = '18'  # Código da carteira
+    boleto.agencia_cedente = '1234'  # Sua agência
+    boleto.conta_cedente = '56789'  # Sua conta
+    boleto.data_vencimento = data_vencimento
+    boleto.valor_documento = valor
+    boleto.cedente = 'Nome do Cedente'
+    boleto.cedente_documento = '123.456.789-00'  # CPF ou CNPJ do cedente
+    boleto.cedente_endereco = 'Endereço do Cedente'
 
-    d.data_vencimento = date(2023, 8, 15)
-    d.data_documento = date(2023, 8, 10)
-    d.data_processamento = date(2023, 8, 10)
+    boleto.pagador = 'Nome do Pagador'
+    boleto.pagador_documento = '987.654.321-00'  # CPF ou CNPJ do pagador
+    boleto.pagador_endereco = 'Endereço do Pagador'
 
-    d.valor_documento = 250.50
-    d.agencia_cedente = '00000'
-    d.conta_cedente = '0000000'
-    d.convenio = '1234567'
-
-    d.carteira = '18'
-    d.variacao_carteira = '019'
-
-    d.cedente = 'Empresa Exemplo'
-    d.cedente_documento = '12.345.678/0001-90'
-    d.cedente_endereco = 'Rua Exemplo, 123 - Centro'
-    d.cedente_uf = 'UF'
-    d.cedente_cep = '12345-678'
-    d.agencia_cedente_dv = '0'
-    d.conta_cedente_dv = '0'
-
-    d.sacado = 'Cliente Exemplo'
-    d.sacado_documento = '123.456.789-01'
-    d.sacado_endereco = 'Rua Cliente, 456 - Bairro'
-    d.sacado_uf = 'Outra UF'
-    d.sacado_cep = '98765-432'
-
-    d.instrucoes = [
-        "Sr. Caixa, não receber após o vencimento.",
-        "Em caso de dúvidas, entre em contato conosco: telefone@example.com",
+    boleto.instrucoes = [
+        'Não receber após o vencimento',
+        'Multa de 2% após o vencimento',
+        'Juros de mora de 1% ao mês',
+        'Cobrar valor adicional em caso de atraso',
+        'Em caso de dúvidas, entre em contato conosco'
     ]
 
-    pdf_filename = 'boleto_banco_do_brasil.pdf'
-    d.save(pdf_filename)
-    print(f"Boleto gerado e salvo como '{pdf_filename}'.")
+    # Definir data_documento como um objeto datetime.date
+    boleto.data_documento = datetime.now().date()
 
-# Chamando a função para gerar o boleto
-criar_boleto()
+    # Criar um objeto BoletoPDF
+    pdf = BoletoPDF("Boleto.pdf")
+
+    # Chamar a função drawBoleto para desenhar o boleto no PDF
+    pdf.drawBoleto(boleto)
+
+    pdf.save()
+
+
+# Chamar a função para gerar o boleto
+gerar_boleto_banco_do_brasil()
